@@ -1,54 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>RSS Reader - TechCrunch</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f5f7fa;
-        }
-        .news-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .news-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-        }
-        .news-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #212529;
-        }
-        .news-date {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-        .news-desc {
-            font-size: 0.95rem;
-            color: #495057;
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-5">
-        <h1 class="mb-4 text-center">📡 TechCrunch RSS Feed</h1>
+@extends('layouts.app')
 
-        <div class="row g-4">
-            @foreach($items as $item)
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ $item['link'] }}" target="_blank" class="text-decoration-none">
-                        <div class="card news-card h-100 border-0 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="news-title mb-2">{{ $item['title'] }}</h5>
-                                <p class="news-date mb-2">{{ \Carbon\Carbon::parse($item['date'])->toDayDateTimeString() }}</p>
-                                <p class="news-desc">{{ Str::limit(strip_tags($item['desc']), 120) }}</p>
-                            </div>
-                        </div>
-                    </a>
+@section('title', 'TechCrunch Feed')
+
+@section('content')
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach($items as $item)
+        <div class="col">
+            <a href="{{ $item['link'] }}" target="_blank" class="text-decoration-none">
+                <div class="card news-card h-100">
+                    @if($item['image'])
+                        <img src="{{ $item['image'] }}" class="card-img-top" alt="news image">
+                    @endif
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ $item->title }}</h5>
+                        <small class="card-time text-muted mt-auto">{{ \Carbon\Carbon::parse($item->published_at)->toDayDateTimeString() }}</small>
+                        <p class="card-text">{{ Str::limit($item->description, 120) }}</p>
+                        
+                    </div>
                 </div>
-            @endforeach
+            </a>
         </div>
-    </div>
-</body>
-</html>
+    @endforeach
+</div>
+
+<div class="mt-4">
+    {{ $items->links('pagination::bootstrap-5') }}
+</div>
+@endsection
